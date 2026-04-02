@@ -1,6 +1,6 @@
 #!/bin/bash
 # Move to the project directory
-cd "/Users/gary/untitled folder 4/webots_swarm"
+cd "$(dirname "$0")"
 
 # Activate the virtual environment
 source venv/bin/activate
