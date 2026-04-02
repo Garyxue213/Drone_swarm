@@ -50,6 +50,8 @@ class SwarmSim2D:
         self.current_frame = 0
         self.target_enabled = True
         self.batteries = [100.0, 100.0, 100.0]
+        self.patterns = ["Vertical Sweep", "Zig-Zag", "Circular Patrol"]
+        self.pattern_idx = 0
         
         # Plot Target (Invisible until found)
         self.target_plot, = self.ax.plot(self.target[0], self.target[1], 'x', color='yellow', markersize=15, alpha=0)
@@ -57,7 +59,7 @@ class SwarmSim2D:
         
         # Keyboard Listener
         self.fig.canvas.mpl_connect('key_press_event', self.on_key_press)
-        self.ax.text(2, 2, "Controls: [H] Hide Target | [R] Restart | [B] Drain D1 Battery", color='gray', fontsize=10)
+        self.ax.text(2, 2, "Controls: [P] Change Pattern | [H] Hide Target | [R] Restart | [B] Drain D1", color='gray', fontsize=10)
         
     def on_key_press(self, event):
         if event.key == 'h':
@@ -94,6 +96,10 @@ class SwarmSim2D:
             if 0 in self.active_drones:
                 self.batteries[0] = 14.9
                 print("[SYSTEM] Battery Drain Triggered! Alpha (D1) at critical battery.")
+                
+        elif event.key == 'p':
+            self.pattern_idx = (self.pattern_idx + 1) % len(self.patterns)
+            print(f"[SYSTEM] Switched Flight Pattern to: {self.patterns[self.pattern_idx]}")
 
     def update(self, frame):
         self.current_frame = frame - self.frame_offset
@@ -148,10 +154,26 @@ class SwarmSim2D:
                     self.drone_pos[i][0] += (target_x - self.drone_pos[i][0]) * 0.1
                     self.drone_pos[i][1] += (target_y - self.drone_pos[i][1]) * 0.1
                 else:
-                    # Hover in center of sector and move up
-                    target_x = x_start + self.curr_widths[i]/2
-                    self.drone_pos[i][0] += (target_x - self.drone_pos[i][0]) * 0.1
-                    self.drone_pos[i][1] = (self.drone_pos[i][1] + 1) % GRID_SIZE
+                    # Search Patterns
+                    pattern = self.patterns[self.pattern_idx]
+                    
+                    if pattern == "Vertical Sweep":
+                        target_x = x_start + self.curr_widths[i]/2
+                        self.drone_pos[i][0] += (target_x - self.drone_pos[i][0]) * 0.1
+                        self.drone_pos[i][1] = (self.drone_pos[i][1] + 1) % GRID_SIZE
+                        
+                    elif pattern == "Zig-Zag":
+                        # Sine wave oscillating across the sector width
+                        target_x = x_start + self.curr_widths[i]/2 + (self.curr_widths[i]/2.5) * np.sin(self.time * 2 + i)
+                        self.drone_pos[i][0] += (target_x - self.drone_pos[i][0]) * 0.1
+                        self.drone_pos[i][1] = (self.drone_pos[i][1] + 0.8) % GRID_SIZE
+                        
+                    elif pattern == "Circular Patrol":
+                        # Cosine/Sine based circular loops constrained to sector
+                        target_x = x_start + self.curr_widths[i]/2 + (self.curr_widths[i]/2.5) * np.cos(self.time * 2 + i)
+                        target_y = 50 + 40 * np.sin(self.time * 2 + i)
+                        self.drone_pos[i][0] += (target_x - self.drone_pos[i][0]) * 0.1
+                        self.drone_pos[i][1] += (target_y - self.drone_pos[i][1]) * 0.1
                     
                     # Target Detection Check
                     dist = np.sqrt((self.drone_pos[i][0]-self.target[0])**2 + (self.drone_pos[i][1]-self.target[1])**2)
@@ -172,7 +194,7 @@ class SwarmSim2D:
         status = f"SWARM {len(self.active_drones)}/3"
         found_txt = " | TARGET: FOUND!" if self.target_found else ""
         batt_str = f"BATT: D1:{self.batteries[0]:.0f}% D2:{self.batteries[1]:.0f}% D3:{self.batteries[2]:.0f}%"
-        self.status_text.set_text(f"TIME: {self.time:.1f}s\nSTATUS: {status}{found_txt}\n{batt_str}")
+        self.status_text.set_text(f"TIME: {self.time:.1f}s\nSTATUS: {status}{found_txt}\nPATTERN: {self.patterns[self.pattern_idx]}\n{batt_str}")
 
         return self.drone_plots + self.sector_rects + [self.status_text, self.alert_text, self.target_plot]
 
