@@ -1,7 +1,10 @@
 #!/bin/bash
-# Automatically change to the backend directory, no matter where this is run from
+# Move to the webots_swarm directory
 cd "$(dirname "$0")/webots_swarm"
 
-# Install requirements and run
-pip3 install websockets
+# Activate the virtual environment and install requirements
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Start the WebSocket telemetry backend
 python3 swarm_web_backend.py
