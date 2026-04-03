@@ -73,7 +73,21 @@ async def simulation_loop(websocket):
             x_start = 0
             for i in range(3):
                 if i in active_drones:
-                    if fire_active and i == 0:
+                    # DRIFT LOGIC FOR DRONE 2 DURING SPOOF ATTACK
+                    if gps_spoofed and i == 1:
+                        target_crash_x = 35.0
+                        target_crash_y = 35.0
+                        # Fast drift to "Building" at [35, 35]
+                        drone_pos[i][0] += (target_crash_x - drone_pos[i][0]) * 0.08
+                        drone_pos[i][1] += (target_crash_y - drone_pos[i][1]) * 0.08
+                        # Rapidly drop altitude
+                        drone_z[i] = max(0, drone_z[i] - 1.5)
+                        
+                        if drone_z[i] <= 0:
+                            active_drones.remove(i)
+                            print(f"[COLLISION] Drone {i+1} has crashed into Site Building Alpha.")
+                        x_start += curr_widths[i]
+                    elif fire_active and i == 0:
                         target_x = fire_pos[0]
                         target_y = fire_pos[1]
                         drone_pos[i][0] += (target_x - drone_pos[i][0]) * 0.05
@@ -87,25 +101,29 @@ async def simulation_loop(websocket):
                         drone_z[i] = 115.0 + 5.0 * math.sin(time_elapsed + i)
                         x_start += curr_widths[i]
                 else:
-                    drone_z[i] = max(0, drone_z[i] - 2.5)
+                    # If already crashed or offline, drop to ground
+                    drone_z[i] = max(0, drone_z[i] - 3.5)
                     x_start += curr_widths[i]
             
             payload = []
             for i in range(3):
-                # Simulated GPS Spoofing Attack/Defense logic
-                status_str = "ACTIVE" if i in active_drones else ("RTB" if batteries[i]<20 else "OFFLINE")
-                sector_str = sectors[i] if i in active_drones else "N/A"
+                # Status Logic
+                if i not in active_drones and drone_z[i] <= 0:
+                    status_str = "CRASHED"
+                else:
+                    status_str = "ACTIVE" if i in active_drones else ("RTB" if batteries[i]<20 else "OFFLINE")
                 
-                # If spoofed, we pick Drone 2 (index 1) to "jitter" but the onboard fusion detects it
+                sector_str = sectors[i] if i in active_drones else "OFFLINE"
+                
+                # Visual Jitter for Spoofing while still in air
                 display_x = drone_pos[i][0]
                 display_y = drone_pos[i][1]
                 
-                if gps_spoofed and i == 1:
-                    # The "Spoof" jitter (Extremely high intensity for guaranteed visibility)
-                    display_x += random.uniform(-35.0, 35.0)
-                    display_y += random.uniform(-35.0, 35.0)
-                    status_str = "GPS ANOMALY"
-                    sector_str = "STATION KEEPING"
+                if gps_spoofed and i == 1 and status_str != "CRASHED":
+                    display_x += random.uniform(-5.0, 5.0)
+                    display_y += random.uniform(-5.0, 5.0)
+                    status_str = "SPOOF: COLLISION COURSE"
+                    sector_str = "SITE HAZARD"
                 
                 if fire_active and i == 0:
                     status_str = "RESPONDING"

@@ -120,22 +120,22 @@ function connectWebSocket() {
       }
       
       if(d.status !== "ACTIVE" && d.status !== "RESPONDING") {
-        card.style.opacity = '0.5';
-        if (markers[d.id]) markers[d.id].classList.add("rtl-mode");
-        
-        if (d.status === "GPS ANOMALY") {
+        card.style.opacity = '1';
+        if (d.status === "CRASHED") {
+          card.classList.add("crashed");
+          if (markers[d.id]) markers[d.id].classList.add("crashed");
+        } else if (d.status.includes("COLLISION")) {
+          card.classList.add("collision-course");
+          if (markers[d.id]) markers[d.id].classList.add("gps-anomaly");
+        } else if (d.status === "GPS ANOMALY") {
           card.classList.add("highlight-red");
           if (markers[d.id]) markers[d.id].classList.add("gps-anomaly");
-        } else {
-          card.classList.remove("highlight-red");
-          if (markers[d.id]) markers[d.id].classList.remove("gps-anomaly");
         }
       } else {
         card.style.opacity = '1';
-        card.classList.remove("highlight-red");
+        card.classList.remove("highlight-red", "crashed", "collision-course");
         if (markers[d.id]) {
-          markers[d.id].classList.remove("rtl-mode");
-          markers[d.id].classList.remove("gps-anomaly");
+          markers[d.id].classList.remove("rtl-mode", "gps-anomaly", "crashed");
         }
       }
       
