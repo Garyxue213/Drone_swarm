@@ -79,7 +79,7 @@ function updateDronePositionsOnMap() {
 let activeWs = null;
 
 function connectWebSocket() {
-  const ws = new WebSocket('wss://99ef-4-71-27-145.ngrok-free.app');
+  const ws = new WebSocket('ws://localhost:8765');
   activeWs = ws;
   
   ws.onopen = () => {

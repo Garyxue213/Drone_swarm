@@ -28,6 +28,18 @@ pip install matplotlib numpy
 python3 webots_swarm/swarm_3d_sim.py
 ```
 
+### 3. Digital Twin Dashboard (Web UI) 🖥️
+The project also features a modern, high-performance web dashboard to monitor live drone telemetry.
+
+**Requirements**: You must have **Python 3** and **Node.js / NPM** installed on your machine.
+
+**Launch**:
+1. Double-click **`Launch_Dashboard_Backend.command`** — starts the Python WebSocket telemetry server.
+2. Double-click **`Launch_Dashboard_Frontend.command`** — starts the web UI.
+3. Open **`http://localhost:5173`** in your browser.
+
+The dashboard will automatically connect to the backend. The **"LIVE TELEMETRY"** indicator will turn green once data is streaming!
+
 ## Interactive Testing Controls (Keyboard HUD)
 While the simulation runs, you can trigger events to test the swarm's real-time dynamic pathing:
 
