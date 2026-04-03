@@ -192,10 +192,11 @@ class SwarmSim3D:
         self.target_widths = [GRID_SIZE/3] * 3
         self.frame_offset = 0
         self.current_frame = 0
+        self.view_mode = 0 # 0=Top-Down, 1=Isometric Pan
         
         # Listeners
         self.fig.canvas.mpl_connect('key_press_event', self.on_key_press)
-        self.fig.text(0.01, 0.02, "Controls: [P] Flight Pattern | [C] Spawn Obstacle (Crane) | [R] Restart | [B] Drain D1 Battery", color='black', fontsize=11, weight='bold')
+        self.fig.text(0.01, 0.02, "Controls: [P] Pattern | [C] Crane | [V] Change View | [R] Restart | [B] Drain D1", color='black', fontsize=11, weight='bold')
         
     def on_key_press(self, event):
         if event.key == 'r':
@@ -252,6 +253,9 @@ class SwarmSim3D:
                 
         elif event.key == 'p':
             self.pattern_idx = (self.pattern_idx + 1) % len(self.patterns)
+            
+        elif event.key == 'v':
+            self.view_mode = (self.view_mode + 1) % 2
 
     def get_ground_elevation(self, x, y):
         iy, ix = int(y), int(x)
@@ -348,7 +352,10 @@ class SwarmSim3D:
             x_start += self.curr_widths[i]
 
         # Camera Pan
-        self.ax.view_init(elev=35, azim=-60 + (self.time * 0.8))
+        if self.view_mode == 0:
+            self.ax.view_init(elev=85, azim=-90) # Straight down on the site
+        else:
+            self.ax.view_init(elev=35, azim=-60 + (self.time * 0.8)) # Dramatic panning
         
         # Project Drones dynamically to 2D Screen Space
         from mpl_toolkits.mplot3d import proj3d
