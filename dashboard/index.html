@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Twin - Construction Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div class="app-container">
+      
+      <!-- Top Navigation -->
+      <nav class="top-nav glass-panel">
+        <div class="logo">
+          <h2>HY-BUILD <span>Digital Twin</span></h2>
+        </div>
+        <div class="nav-controls">
+          <div class="sensor-status status-active">
+            <span class="dot"></span> LIVE TELEMETRY
+          </div>
+          <div class="date-picker">
+            <span>Scan: </span><strong>April 02, 2026</strong>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        
+        <!-- Sidebar: Drone Telemetry -->
+        <aside class="sidebar left-sidebar glass-panel">
+          <h3>Swarm Telemetry</h3>
+          
+          <div class="drone-card" id="card-d1">
+            <div class="drone-header">
+              <img src="/drone.png" alt="D1" class="drone-icon-small">
+              <h4>D1-Surveyor</h4>
+              <span class="battery">92%</span>
+            </div>
+            <div class="drone-stats">
+              <div class="stat"><span class="label">ALT</span><span class="value" id="d1-alt">120m</span></div>
+              <div class="stat"><span class="label">VEL</span><span class="value" id="d1-vel">4.2m/s</span></div>
+              <div class="stat"><span class="label">SECTOR</span><span class="value" id="d1-sec">North Grid</span></div>
+            </div>
+          </div>
+
+          <div class="drone-card" id="card-d2">
+            <div class="drone-header">
+              <img src="/drone.png" alt="D2" class="drone-icon-small">
+              <h4>D2-Inspections</h4>
+              <span class="battery">88%</span>
+            </div>
+            <div class="drone-stats">
+              <div class="stat"><span class="label">ALT</span><span class="value" id="d2-alt">85m</span></div>
+              <div class="stat"><span class="label">VEL</span><span class="value" id="d2-vel">2.1m/s</span></div>
+              <div class="stat"><span class="label">SECTOR</span><span class="value" id="d2-sec">Crane Tower</span></div>
+            </div>
+          </div>
+
+          <div class="drone-card" id="card-d3">
+            <div class="drone-header">
+              <img src="/drone.png" alt="D3" class="drone-icon-small alert-pulse">
+              <h4>D3-Mapping</h4>
+              <span class="battery low">14%</span>
+            </div>
+            <div class="drone-stats">
+              <div class="stat"><span class="label">ALT</span><span class="value" id="d3-alt">15m</span></div>
+              <div class="stat"><span class="label">VEL</span><span class="value" id="d3-vel">0.0m/s</span></div>
+              <div class="stat"><span class="label">SECTOR</span><span class="value" id="d3-sec">RTL</span></div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn primary" id="btn-refresh">🔄 Refresh Mission</button>
+            <button class="btn danger" id="btn-rtl">🚨 Emergency RTL</button>
+            <button class="btn" style="background-color: #f97316; color: white;" id="btn-fire">🔥 Spawn Fire</button>
+          </div>
+        </aside>
+
+        <!-- Center: Interactive Map Simulator -->
+        <section class="map-container">
+          <div class="map-view" id="map-view">
+            <img src="/map.png" alt="Construction Site Orthomosaic" class="base-map" id="base-map" />
+            
+            <!-- Drone SVG Markers dynamically injected by JS -->
+            <div class="drone-marker" id="marker-d1" style="top: 20%; left: 30%;">
+              <img src="/drone.png" alt="drone">
+              <div class="drone-label">D1</div>
+            </div>
+            <div class="drone-marker" id="marker-d2" style="top: 50%; left: 60%;">
+              <img src="/drone.png" alt="drone">
+              <div class="drone-label">D2</div>
+            </div>
+            <div class="drone-marker rtl-mode" id="marker-d3" style="top: 80%; left: 20%;">
+              <img src="/drone.png" alt="drone">
+              <div class="drone-label">D3</div>
+            </div>
+            <div id="marker-fire" style="display: none; position: absolute; font-size: 32px; filter: drop-shadow(0 0 10px #ef4444); transform: translate(-50%, -50%); z-index: 100;">🔥</div>
+
+
+            <!-- Heatmap / Volumetrics Overlay -->
+            <div class="heatmap-overlay"></div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls glass-panel">
+              <button class="icon-btn active" title="Orthomosaic">🛰️</button>
+              <button class="icon-btn" title="Point Cloud">☁️</button>
+              <button class="icon-btn" title="Measure">📐</button>
+              <button class="icon-btn" title="Annotations">📍</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sidebar: Drone POV Cameras -->
+        <aside class="sidebar right-sidebar glass-panel">
+          <h3>Live Drone POV</h3>
+          
+          <div class="pov-container">
+            <div class="pov-header">D1-Surveyor</div>
+            <div class="pov-window" id="pov-d1">
+              <div class="crosshair"></div>
+              <div class="pov-hud" id="pov-alt-d1">ALT: 120m</div>
+              <div id="pov-d1-fire" style="display: none; position: absolute; top: 50%; left: 50%; font-size: 3rem; transform: translate(-50%, -50%); filter: drop-shadow(0 0 10px red);">🔥</div>
+            </div>
+          </div>
+
+          <div class="pov-container">
+            <div class="pov-header">D2-Inspections</div>
+            <div class="pov-window" id="pov-d2">
+              <div class="crosshair"></div>
+              <div class="pov-hud" id="pov-alt-d2">ALT: 85m</div>
+            </div>
+          </div>
+
+          <div class="pov-container">
+            <div class="pov-header">D3-Mapping</div>
+            <div class="pov-window" id="pov-d3">
+              <div class="crosshair"></div>
+              <div class="pov-hud" id="pov-alt-d3">ALT: 15m</div>
+            </div>
+          </div>
+          
+          <div class="analysis-section logs-container">
+            <h4>System Comm Logs</h4>
+            <div class="console-log" id="console-log">
+              <p>[09:12:00] Booting Swarm WebSocket Bridge...</p>
+            </div>
+          </div>
+
+        </aside>
+      </main>
+    </div>
+    
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
