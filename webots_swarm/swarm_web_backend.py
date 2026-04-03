@@ -42,6 +42,8 @@ async def simulation_loop(websocket):
                     batteries = [14.0, 14.0, 14.0]
                 elif data.get("command") == "fire":
                     fire_active = True
+                elif data.get("command") == "spoof":
+                    gps_spoofed = True
             except (asyncio.TimeoutError, json.JSONDecodeError):
                 pass
 
@@ -85,14 +87,34 @@ async def simulation_loop(websocket):
             
             payload = []
             for i in range(3):
+                # Simulated GPS Spoofing Attack/Defense logic
+                status_str = "ACTIVE" if i in active_drones else ("RTB" if batteries[i]<20 else "OFFLINE")
+                sector_str = sectors[i] if i in active_drones else "N/A"
+                
+                # If spoofed, we pick Drone 2 (index 1) to "jitter" but the onboard fusion detects it
+                display_x = drone_pos[i][0]
+                display_y = drone_pos[i][1]
+                
+                if gps_spoofed and i == 1:
+                    import random
+                    # The "Spoof" jitter
+                    display_x += random.uniform(-15.0, 15.0)
+                    display_y += random.uniform(-15.0, 15.0)
+                    status_str = "GPS ANOMALY"
+                    sector_str = "STATION KEEPING"
+                
+                if fire_active and i == 0:
+                    status_str = "RESPONDING"
+                    sector_str = "FIRE INVESTIGATION"
+
                 payload.append({
                     "id": f"d{i+1}",
-                    "x": drone_pos[i][0],
-                    "y": drone_pos[i][1],
+                    "x": display_x,
+                    "y": display_y,
                     "z": drone_z[i],
                     "battery": batteries[i],
-                    "status": "RESPONDING" if (fire_active and i == 0) else ("ACTIVE" if i in active_drones else ("RTB" if batteries[i]<20 else "OFFLINE")),
-                    "sector": "FIRE INVESTIGATION" if (fire_active and i == 0) else (sectors[i] if i in active_drones else "N/A"),
+                    "status": status_str,
+                    "sector": sector_str,
                     "fire_active": fire_active,
                     "fire_pos_x": fire_pos[0],
                     "fire_pos_y": fire_pos[1]

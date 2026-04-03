@@ -167,10 +167,10 @@ document.getElementById('btn-rtl').addEventListener('click', () => {
   }
 });
 
-document.getElementById('btn-fire').addEventListener('click', () => {
+document.getElementById('btn-spoof').addEventListener('click', () => {
   if (activeWs && activeWs.readyState === WebSocket.OPEN) {
-    activeWs.send(JSON.stringify({ command: 'fire' }));
-    logEvent("🔥 Fire Alert injected!", true);
+    activeWs.send(JSON.stringify({ command: 'spoof' }));
+    logEvent("🛰️ GPS Spoofing Attack Injected!", true);
   }
 });
 
