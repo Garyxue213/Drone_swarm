@@ -10,6 +10,9 @@ DRONES = ["Alpha (D1)", "Bravo (D2)", "Charlie (D3)"]
 COLORS = ["#0000FF", "#00FF00", "#FF0000"] # High contrast Primary colors
 FAILURE_TIME = 15
 
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+import matplotlib.image as mpimg
+
 class Building:
     def __init__(self, x, y, w, h, z, color, name):
         self.x, self.y, self.w, self.h, self.z = x, y, w, h, z
@@ -32,6 +35,14 @@ class SwarmSim3D:
         # POV Camera Subplots
         self.cam_axes = []
         self.cam_images = []
+        self.cam_drones = []
+        
+        # Pre-load drone image
+        try:
+            drone_icon = mpimg.imread('webots_swarm/drone.png')
+        except:
+            drone_icon = np.zeros((10, 10)) # fallback if not found
+            
         for i in range(3):
             ax = self.fig.add_subplot(gs[i, -1])
             ax.set_title(f"{DRONES[i]} Topological Cam", color='black', fontsize=10, pad=3)
@@ -39,8 +50,15 @@ class SwarmSim3D:
             ax.set_yticks([])
             dummy_img = np.zeros((30, 30))
             img = ax.imshow(dummy_img, cmap='terrain', vmin=0, vmax=160)
+            
+            # Overlay the solid Drone Icon right in the center (crosshair)
+            imagebox = OffsetImage(drone_icon, zoom=0.06)
+            ab = AnnotationBbox(imagebox, (15, 15), frameon=False, zorder=10)
+            ax.add_artist(ab)
+            
             self.cam_axes.append(ax)
             self.cam_images.append(img)
+            self.cam_drones.append(ab)
             
         # Global 3D styling
         self.ax.set_xlim(0, GRID_SIZE)
@@ -227,6 +245,7 @@ class SwarmSim3D:
             self.alert_text.set_alpha(1.0)
             self.cam_axes[2].set_title("FEED LOST", color='gray')
             self.cam_images[2].set_data(np.zeros((30,30)))
+            self.cam_drones[2].set_alpha(0.0) # Hide the drone icon
         
         if self.time > FAILURE_TIME + 3:
             curr_alpha = self.alert_text.get_alpha()
