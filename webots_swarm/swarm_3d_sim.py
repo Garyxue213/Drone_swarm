@@ -110,11 +110,47 @@ class SwarmSim3D:
             colors.append(b.color)
 
         # Solid Shaded 3D Bars for Realism
-        self.ax.bar3d(x_pos, y_pos, z3, dx, dy, dz, color=colors, shade=True, alpha=1.0, zorder=10)
+        self.ax.bar3d(x_pos, y_pos, z3, dx, dy, dz, color=colors, shade=True, alpha=0.9, zorder=10)
+        
+        # --- DRAW STRUCTURAL DETAILS (Windows / Scaffolding) ---
+        for b in self.buildings:
+            bx, by, bz = b.x, b.y, b.ground_z
+            bw, bh, bd = b.w, b.h, b.z
+            
+            # Scaffolding X-Braces
+            if 'Scaffold' in b.name:
+                for z_step in np.linspace(bz, bz + bd, 4)[:-1]:
+                    # Front face
+                    self.ax.plot([bx, bx+bw], [by, by], [z_step, z_step + (bd/3)], color='#333333', lw=1.5, zorder=11)
+                    self.ax.plot([bx, bx+bw], [by, by], [z_step + (bd/3), z_step], color='#333333', lw=1.5, zorder=11)
+                    # Right face
+                    self.ax.plot([bx+bw, bx+bw], [by, by+bh], [z_step, z_step + (bd/3)], color='#333333', lw=1.5, zorder=11)
+                    self.ax.plot([bx+bw, bx+bw], [by, by+bh], [z_step + (bd/3), z_step], color='#333333', lw=1.5, zorder=11)
+            
+            # Windows on Tower
+            elif 'Tower' in b.name:
+                # Add light blue glass pane overlays to the sides
+                self.ax.bar3d([bx+0.5], [by-0.1], [bz+5], [bw-1], [bh+0.2], [bd-10], color='#3498db', shade=True, alpha=0.7, zorder=10)
+                # Add Window Grids
+                for z_step in np.linspace(bz+5, bz+bd-5, 8):
+                    self.ax.plot([bx, bx+bw], [by-0.2, by-0.2], [z_step, z_step], color='silver', lw=1, zorder=12)
+                for x_step in np.linspace(bx, bx+bw, 5):
+                    self.ax.plot([x_step, x_step], [by-0.2, by-0.2], [bz+5, bz+bd-5], color='silver', lw=1, zorder=12)
+            
+            # Horizontal lines for Concrete
+            elif 'Concrete' in b.name:
+                for z_step in np.linspace(bz, bz+bd, 6):
+                    self.ax.plot([bx, bx+bw], [by-0.1, by-0.1], [z_step, z_step], color='#555555', lw=2, zorder=11)
+            
+            # Vertical grooves for Trailer
+            elif 'Trailer' in b.name:
+                for x_step in np.linspace(bx, bx+bw, 8):
+                    self.ax.plot([x_step, x_step], [by-0.1, by-0.1], [bz, bz+bd], color='#dddddd', lw=1.5, zorder=11)
         
         for b in self.buildings:
             # Drop an indicator line / label above building
-            self.ax.text(b.x + b.w/2, b.y + b.h/2, b.z + b.ground_z + 10, f"{b.name}", color='black', fontsize=8, ha='center', weight='bold')
+            self.ax.plot([b.x + b.w/2, b.x + b.w/2], [b.y + b.h/2, b.y + b.h/2], [b.ground_z + b.z, b.ground_z + b.z + 10], color='black', lw=1, zorder=10)
+            self.ax.text(b.x + b.w/2, b.y + b.h/2, b.z + b.ground_z + 12, f"{b.name}", color='black', fontsize=7, ha='center', weight='bold')
 
         self.cranes = []
         self.crane_artists = []
@@ -198,9 +234,21 @@ class SwarmSim3D:
             c_xmin, c_xmax = int(max(0, cx-5)), int(min(GRID_SIZE, cx+5))
             self.elevation_map[c_ymin:c_ymax, c_xmin:c_xmax] = 150 + c_base_z
             
-            bar = self.ax.bar3d([cx-5], [cy-5], [c_base_z], [10], [10], [150], color='#e74c3c', shade=True, alpha=1.0)
-            txt = self.ax.text(cx, cy, c_base_z + 160, "CRANE\n(150m)", color='black', fontsize=9, weight='bold')
-            self.crane_artists.extend([bar, txt])
+            # Vertical Tower
+            bar = self.ax.bar3d([cx-2], [cy-2], [c_base_z], [4], [4], [150], color='#e74c3c', shade=True, alpha=1.0, zorder=10)
+            # Horizontal Boom
+            boom = self.ax.bar3d([cx-15], [cy-2], [c_base_z + 140], [40], [4], [4], color='#e74c3c', shade=True, alpha=1.0, zorder=10)
+            # Operator Cab
+            cab = self.ax.bar3d([cx-4], [cy-4], [c_base_z + 130], [8], [8], [10], color='black', shade=True, alpha=1.0, zorder=10)
+            
+            txt = self.ax.text(cx, cy, c_base_z + 160, "TOWER CRANE\n(150m)", color='#e74c3c', fontsize=9, weight='bold')
+            self.crane_artists.extend([bar, boom, cab, txt])
+            
+            # Add X-Truss lines to vertical tower for realism
+            for z_step in np.linspace(c_base_z, c_base_z+150, 15)[:-1]:
+                truss1, = self.ax.plot([cx-2, cx+2], [cy-2.1, cy-2.1], [z_step, z_step+10], color='black', lw=1, zorder=11)
+                truss2, = self.ax.plot([cx-2, cx+2], [cy-2.1, cy-2.1], [z_step+10, z_step], color='black', lw=1, zorder=11)
+                self.crane_artists.extend([truss1, truss2])
                 
         elif event.key == 'p':
             self.pattern_idx = (self.pattern_idx + 1) % len(self.patterns)
