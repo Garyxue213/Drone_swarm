@@ -39,7 +39,7 @@ class SwarmSim3D:
         
         # Pre-load drone image
         try:
-            drone_icon = mpimg.imread('webots_swarm/drone.png')
+            drone_icon = mpimg.imread('webots_swarm/drone_actual.png')
         except:
             drone_icon = np.zeros((10, 10)) # fallback if not found
             
@@ -78,7 +78,7 @@ class SwarmSim3D:
         # Shade the surface terrain based on a light source
         ls = LightSource(270, 45)
         rgb = ls.shade(self.elevation_map, cmap=plt.cm.terrain, vert_exag=1, blend_mode='soft')
-        self.ax.plot_surface(X, Y, self.elevation_map, facecolors=rgb, rstride=1, cstride=1, linewidth=0, antialiased=True, alpha=0.9)
+        self.ax.plot_surface(X, Y, self.elevation_map, facecolors=rgb, rstride=3, cstride=3, linewidth=0, antialiased=False, alpha=0.9)
 
         # Buildings
         self.buildings = [
@@ -120,12 +120,22 @@ class SwarmSim3D:
         self.crane_artists = []
         
         # ---------------- DRONE MODELS (Drop Shadows added for realism) ----------------
+        from mpl_toolkits.mplot3d import proj3d
         self.drone_plots = []
-        self.drone_shadows = [] # Thin lines connecting drone to ground for vertical perception
+        self.drone_shadows = []
+        
+        try:
+            main_drone_icon = mpimg.imread('webots_swarm/drone_actual.png')
+        except:
+            main_drone_icon = np.zeros((10, 10))
+            
         for c in COLORS:
-            p, = self.ax.plot([], [], [], marker='P', color=c, markersize=12, markeredgecolor='black', linestyle='None', zorder=20)
+            imagebox = OffsetImage(main_drone_icon, zoom=0.04)
+            ab = AnnotationBbox(imagebox, (0, 0), xycoords='data', frameon=False, zorder=20)
+            self.ax.add_artist(ab)
+            self.drone_plots.append(ab)
+            
             s, = self.ax.plot([], [], [], color='black', linestyle='--', linewidth=0.8, alpha=0.5)
-            self.drone_plots.append(p)
             self.drone_shadows.append(s)
 
         # HUD
@@ -234,7 +244,7 @@ class SwarmSim3D:
                         self.target_widths[j] = GRID_SIZE / rem if j in self.active_drones else 0
                 self.alert_text.set_text(f"!!! {DRONES[i]} BATTERY LOW - RTB !!!")
                 self.alert_text.set_alpha(1.0)
-                self.drone_plots[i].set_color('#888888')
+                self.drone_plots[i].set_alpha(0.3)
                 self.cam_axes[i].set_title(f"{DRONES[i]} OFFLINE", color='gray')
                 self.cam_images[i].set_data(np.zeros((30,30)))
         
@@ -282,12 +292,8 @@ class SwarmSim3D:
             else:
                 self.drone_z[i] = max(ground_z_now, self.drone_z[i] - 2.5)
             
-            # Map Drone Location
-            dx, dy, dz = self.drone_pos[i][0], self.drone_pos[i][1], self.drone_z[i]
-            self.drone_plots[i].set_data([dx], [dy])
-            self.drone_plots[i].set_3d_properties([dz])
-            
             # Draw ground shadow for realistic depth perception
+            dx, dy, dz = self.drone_pos[i][0], self.drone_pos[i][1], self.drone_z[i]
             self.drone_shadows[i].set_data([dx, dx], [dy, dy])
             self.drone_shadows[i].set_3d_properties([ground_z_now, dz])
             
@@ -295,6 +301,13 @@ class SwarmSim3D:
 
         # Camera Pan
         self.ax.view_init(elev=35, azim=-60 + (self.time * 0.8))
+        
+        # Project Drones dynamically to 2D Screen Space
+        from mpl_toolkits.mplot3d import proj3d
+        for i in range(3):
+            dx, dy, dz = self.drone_pos[i][0], self.drone_pos[i][1], self.drone_z[i]
+            x2, y2, _ = proj3d.proj_transform(dx, dy, dz, self.ax.get_proj())
+            self.drone_plots[i].xy = (x2, y2)
 
         status = f"SURVEY TEAM {len(self.active_drones)}/3"
         batt_str = f"BATT: D1:{self.batteries[0]:.0f}% | D2:{self.batteries[1]:.0f}% | D3:{self.batteries[2]:.0f}%"
