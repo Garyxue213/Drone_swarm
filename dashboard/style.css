@@ -140,6 +140,21 @@ h3 {
   margin-bottom: 12px;
 }
 
+.drone-card.highlight-red {
+  border: 1.5px solid var(--accent-red) !important;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.drone-card.highlight-red .drone-icon-small {
+  animation: jitter-icon 0.1s infinite;
+}
+
+@keyframes jitter-icon {
+  0% { transform: scale(1.1); }
+  100% { transform: scale(1.0); }
+}
+
 .drone-icon-small {
   width: 24px;
   height: 24px;
@@ -257,6 +272,10 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.drone-marker.gps-anomaly {
+  transition: all 0.05s linear !important; /* Fast transitions for jitter */
 }
 
 .drone-marker img {
@@ -417,6 +436,41 @@ h3 {
   filter: drop-shadow(0 0 5px red) !important;
 }
 
+/* EMERGENCY BANNER AT TOP OF MAP */
+.emergency-banner {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent-red);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  z-index: 1000;
+  display: none;
+  animation: banner-flash 1s infinite alternate;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+@keyframes banner-flash {
+  from { opacity: 1; transform: translateX(-50%) scale(1); }
+  to { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
+}
+
+.fire-marker {
+  font-size: 40px;
+  filter: drop-shadow(0 0 10px #ef4444);
+  animation: fire-pulse 0.8s infinite alternate;
+  z-index: 100;
+}
+
+@keyframes fire-pulse {
+  from { transform: translate(-50%, -50%) scale(1); filter: drop-shadow(0 0 5px #ef4444); }
+  to { transform: translate(-50%, -50%) scale(1.3); filter: drop-shadow(0 0 20px #ef4444); }
+}
+
 /* POV CAMERAS */
 .pov-container {
   margin-bottom: 5px;
@@ -465,4 +519,61 @@ h3 {
   font-size: 0.7rem;
   padding: 2px 5px;
   border-radius: 4px;
+}
+
+/* HACKER CONSOLE */
+.hacker-section {
+  background: #000;
+  border: 1px solid #00ff41;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+}
+
+.hacker-section h3 {
+  color: #00ff41 !important;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.hacker-terminal {
+  height: 120px;
+  background: black;
+  color: #00ff41;
+  font-family: monospace;
+  font-size: 0.65rem;
+  overflow-y: auto;
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  padding: 5px;
+  line-height: 1.2;
+}
+
+.hacker-controls {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.btn-hacker {
+  flex: 1;
+  background: black;
+  color: #00ff41;
+  border: 1px solid #00ff41;
+  font-size: 0.65rem;
+  padding: 5px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.btn-hacker:hover {
+  background: #00ff41;
+  color: black;
+}
+
+.packet-intercept {
+  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  padding: 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

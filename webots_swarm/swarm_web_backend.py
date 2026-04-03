@@ -99,9 +99,9 @@ async def simulation_loop(websocket):
                 
                 if gps_spoofed and i == 1:
                     import random
-                    # The "Spoof" jitter
-                    display_x += random.uniform(-15.0, 15.0)
-                    display_y += random.uniform(-15.0, 15.0)
+                    # The "Spoof" jitter (Increased intensity for visibility)
+                    display_x += random.uniform(-25.0, 25.0)
+                    display_y += random.uniform(-25.0, 25.0)
                     status_str = "GPS ANOMALY"
                     sector_str = "STATION KEEPING"
                 

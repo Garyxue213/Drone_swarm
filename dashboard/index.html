@@ -98,7 +98,10 @@
               <img src="/drone.png" alt="drone">
               <div class="drone-label">D3</div>
             </div>
-            <div id="marker-fire" style="display: none; position: absolute; font-size: 32px; filter: drop-shadow(0 0 10px #ef4444); transform: translate(-50%, -50%); z-index: 100;">🔥</div>
+            <div class="emergency-banner" id="fire-banner">🔥 ACTIVE FIRE EMERGENCY - DRONE 1 RESPONDING</div>
+            <div id="wrapper-fire" style="display: none; position: absolute; z-index: 100;">
+              <div class="fire-marker">🔥</div>
+            </div>
 
 
             <!-- Heatmap / Volumetrics Overlay -->
@@ -139,6 +142,18 @@
             <h4>System Comm Logs</h4>
             <div class="console-log" id="console-log">
               <p>[09:12:00] Booting Swarm WebSocket Bridge...</p>
+            </div>
+          </div>
+
+          <!-- BONUS: Integrated Attacker Panel -->
+          <div class="hacker-section">
+            <h3>💀 ATTACKER_CONSOLE</h3>
+            <div class="hacker-terminal" id="hacker-terminal">
+              Initializing Sniffer...
+            </div>
+            <div class="hacker-controls">
+              <button class="btn-hacker" id="btn-inject-fire">Inject Fire</button>
+              <button class="btn-hacker" id="btn-inject-spoof">Inject Spoof</button>
             </div>
           </div>
 

@@ -65,13 +65,20 @@ function updateDronePositionsOnMap() {
   });
 
   if (dronesData.length > 0 && dronesData[0].fire_active) {
-    const fm = document.getElementById('marker-fire');
-    fm.style.display = 'block';
-    fm.style.left = `${dronesData[0].fire_pos_x}%`;
-    fm.style.top = `${dronesData[0].fire_pos_y}%`;
-    fm.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px))`;
+    const fw = document.getElementById('wrapper-fire');
+    const fb = document.getElementById('fire-banner');
+    if (fw) {
+      fw.style.display = 'block';
+      fw.style.left = `${dronesData[0].fire_pos_x}%`;
+      fw.style.top = `${dronesData[0].fire_pos_y}%`;
+      fw.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px))`;
+    }
+    if (fb) fb.style.display = 'block';
   } else {
-    document.getElementById('marker-fire').style.display = 'none';
+    const fw = document.getElementById('wrapper-fire');
+    const fb = document.getElementById('fire-banner');
+    if (fw) fw.style.display = 'none';
+    if (fb) fb.style.display = 'none';
   }
 }
 
@@ -112,12 +119,24 @@ function connectWebSocket() {
         else battEl.className = 'battery';
       }
       
-      if(d.status !== "ACTIVE") {
+      if(d.status !== "ACTIVE" && d.status !== "RESPONDING") {
         card.style.opacity = '0.5';
         if (markers[d.id]) markers[d.id].classList.add("rtl-mode");
+        
+        if (d.status === "GPS ANOMALY") {
+          card.classList.add("highlight-red");
+          if (markers[d.id]) markers[d.id].classList.add("gps-anomaly");
+        } else {
+          card.classList.remove("highlight-red");
+          if (markers[d.id]) markers[d.id].classList.remove("gps-anomaly");
+        }
       } else {
         card.style.opacity = '1';
-        if (markers[d.id]) markers[d.id].classList.remove("rtl-mode");
+        card.classList.remove("highlight-red");
+        if (markers[d.id]) {
+          markers[d.id].classList.remove("rtl-mode");
+          markers[d.id].classList.remove("gps-anomaly");
+        }
       }
       
       // Update POV Camera
@@ -149,9 +168,34 @@ function connectWebSocket() {
           }
         }
       }
+      // Update Hacker Terminal (Bonus: Eavesdropping Case)
+      const hackerTerm = document.getElementById('hacker-terminal');
+      if (hackerTerm) {
+        const p = document.createElement('div');
+        p.className = 'packet-intercept';
+        p.innerText = `[RECV] ${JSON.stringify(dronesData).substring(0, 80)}...`;
+        hackerTerm.appendChild(p);
+        if (hackerTerm.childNodes.length > 15) hackerTerm.removeChild(hackerTerm.firstChild);
+        hackerTerm.scrollTop = hackerTerm.scrollHeight;
+      }
     });
   };
 }
+
+// Hacker Injection Logic
+document.getElementById('btn-inject-fire').addEventListener('click', () => {
+  if (activeWs && activeWs.readyState === WebSocket.OPEN) {
+    activeWs.send(JSON.stringify({ command: 'fire' }));
+    logEvent("💀 PACKET INJECTION: FORCED FIRE ALERT", true);
+  }
+});
+
+document.getElementById('btn-inject-spoof').addEventListener('click', () => {
+  if (activeWs && activeWs.readyState === WebSocket.OPEN) {
+    activeWs.send(JSON.stringify({ command: 'spoof' }));
+    logEvent("💀 PACKET INJECTION: GPS OFFSET OVERRIDE", true);
+  }
+});
 
 document.getElementById('btn-refresh').addEventListener('click', () => {
   if (activeWs && activeWs.readyState === WebSocket.OPEN) {
@@ -164,6 +208,13 @@ document.getElementById('btn-rtl').addEventListener('click', () => {
   if (activeWs && activeWs.readyState === WebSocket.OPEN) {
     activeWs.send(JSON.stringify({ command: 'rtl' }));
     logEvent("Emergency RTL command sent.", true);
+  }
+});
+
+document.getElementById('btn-fire').addEventListener('click', () => {
+  if (activeWs && activeWs.readyState === WebSocket.OPEN) {
+    activeWs.send(JSON.stringify({ command: 'fire' }));
+    logEvent("🔥 Fire Alert injected!", true);
   }
 });
 
