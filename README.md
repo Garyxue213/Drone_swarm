@@ -6,7 +6,7 @@ Welcome to the **Drone Swarm Construction Mapping** visualizer. This repository 
 This project pivots away from basic search and rescue to address modern industrial capabilities: **Digital Twins** and **Site Safety**. The drone swarm dynamically tracks topographical elevations (Z-Axis), executes Orthomosaic patterns, and features a self-healing algorithm where surviving drones will expand their search footprint if a teammate suffers hardware malfunction or battery depletion.
 
 ## How to Run the Logic Visualizer
-The AI logic and simulation is visualized entirely through a Python 2D Topographical Map.
+The AI logic and simulation is visualized entirely through a Python 3D Topographical Map.
 
 **Requirements**: You must have `matplotlib` and `numpy` installed.
 ```bash
@@ -15,9 +15,9 @@ pip install matplotlib numpy
 
 **Launch**:
 ```bash
-python3 webots_swarm/swarm_2d_sim.py
+python3 webots_swarm/swarm_3d_sim.py
 ```
-*(Or simply run the included `Launch_2D_Logic_Viz.command` file on Mac/Linux).*
+*(Or simply run the included `Launch_3D_Logic_Viz.command` file on Mac/Linux).*
 
 ## Interactive Testing Controls (Keyboard HUD)
 While the simulation runs, you can trigger events to test the swarm's real-time dynamic pathing:

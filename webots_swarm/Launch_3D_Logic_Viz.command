@@ -5,5 +5,6 @@ cd "$(dirname "$0")"
 # Activate the virtual environment
 source venv/bin/activate
 
-# Run the 2D simulation
-python3 swarm_2d_sim.py
+# Run the 3D simulation
+pip3 install matplotlib numpy
+python3 swarm_3d_sim.py

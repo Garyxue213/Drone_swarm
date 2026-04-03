@@ -1,0 +1,131 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{xcolor}
+\geometry{a4paper, margin=1in}
+
+\title{Cybersecurity of Drones: Kinematics and Coordinate Frames}
+\author{Calculated Solutions}
+\date{\today}
+
+\newcommand{\question}[1]{\noindent\textbf{Question:}\textit{ #1}\vspace{1em}\\}
+
+\begin{document}
+
+\maketitle
+
+\section*{Question 1: Perceived Euler Angle Rates}
+\question{Attackers spoof the gyroscope of a UAV, adding a constant malicious angular rate offset to the pitch rate $q$. The true body angular velocity is $\omega = [0,0,0]^T$, but the measured is $\omega_{spoofed} = [0, q_{malicious}, 0]^T$. Using the inverse Jacobian matrix, calculate the perceived Euler angle rates $[\dot{\phi}, \dot{\theta}, \dot{\psi}]^T$ when the drone is currently at a roll $\phi$ and pitch $\theta$.}
+
+The inverse Jacobian matrix $W$ maps body angular velocities $[p, q, r]^T$ to Euler angle rates $[\dot{\phi}, \dot{\theta}, \dot{\psi}]^T$:
+\begin{equation}
+\begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix} = 
+\begin{bmatrix} 
+1 & \sin \phi \tan \theta & \cos \phi \tan \theta \\ 
+0 & \cos \phi & -\sin \phi \\ 
+0 & \sin \phi \sec \theta & \cos \phi \sec \theta 
+\end{bmatrix} 
+\begin{bmatrix} p \\ q \\ r \end{bmatrix}
+\end{equation}
+Given the spoofed measurement $\omega_{spoofed} = [0, q_{malicious}, 0]^T$:
+\begin{itemize}
+    \item $\dot{\phi} = q_{malicious} \sin \phi \tan \theta$
+    \item $\dot{\theta} = q_{malicious} \cos \phi$
+    \item $\dot{\psi} = q_{malicious} \sin \phi \sec \theta$
+\end{itemize}
+
+\section*{Question 2: Gimbal Lock Critical Angle}
+\question{A malicious actor aims to exploit a vulnerability known as gimbal lock to cause a flight control failure. They inject commands to force the pitch angle $\theta$ to approach a specific critical value. Identify this critical angle and demonstrate mathematically why it causes the inverse Jacobian matrix to become undefined.}
+
+Gimbal lock occurs at the critical angle $\theta = \pm 90^\circ$ ($\pm \pi/2$ radians). 
+The forward Jacobian $J$ has a determinant $|J| = \cos \theta$. When $\theta = 90^\circ$, $\cos(90^\circ) = 0$. Since the inverse Jacobian $W = J^{-1} = \frac{adj(J)}{|J|}$, the division by zero makes the matrix undefined. This causes a singularity where two of the three rotation axes align, resulting in a loss of one degree of freedom and rendering the control equations insolvable.
+
+\section*{Question 3: Tampered Rotation Matrix Determinant}
+\question{During a man-in-the-middle attack, the transmission of a rotation matrix $R^1_0$ for a rotation around the $k$-axis is intercepted. The attacker changes the element in the first row and second column from $\sin \theta$ to 0. Calculate the determinant of this tampered matrix to prove it is no longer a valid orthogonal rotation matrix.}
+
+A valid rotation matrix around the $k$-axis (z-axis) is given by:
+\begin{equation}
+R = \begin{bmatrix} \cos \theta & \sin \theta & 0 \\ -\sin \theta & \cos \theta & 0 \\ 0 & 0 & 1 \end{bmatrix} \implies \text{det}(R) = \cos^2 \theta + \sin^2 \theta = 1
+\end{equation}
+If the element $R_{12}$ is changed from $\sin \theta$ to $0$:
+\begin{equation}
+R_{tampered} = \begin{bmatrix} \cos \theta & 0 & 0 \\ -\sin \theta & \cos \theta & 0 \\ 0 & 0 & 1 \end{bmatrix} \implies \text{det}(R_{tampered}) = \cos^2 \theta
+\end{equation}
+Since $\text{det}(R) = 1$ is a requirement for an orthogonal rotation matrix, and $\cos^2 \theta \neq 1$ for most $\theta$, the tampered matrix violates the properties of a valid rotation.
+
+\section*{Question 4: Quaternion Manipulation}
+\question{A drone’s navigation system utilizes a unit quaternion $q = q_r + q_i i + q_j j + q_k k$ for orientation. A cyberattack flips the sign of the scalar part $q_r$ but leaves the vector part unchanged. Evaluate how this specific manipulation alters the recovered rotation angle $\theta$ using the axis-angle representation formulas.}
+
+A unit quaternion is $q = \cos(\theta/2) + \sin(\theta/2)\mathbf{u}$. Flipping the sign of the scalar part $q_r$:
+\begin{equation}
+q' = -\cos(\theta/2) + \sin(\theta/2)\mathbf{u}
+\end{equation}
+Using the trig identity $\cos(\pi - x) = -\cos x$ and $\sin(\pi - x) = \sin x$:
+\begin{equation}
+q' = \cos(\pi - \theta/2) + \sin(\pi - \theta/2)\mathbf{u}
+\end{equation}
+The recovered angle becomes $2(\pi - \theta/2) = 2\pi - \theta$. Mathematically, a rotation by $2\pi - \theta$ is equivalent to a rotation by $-\theta$. Therefore, flipping the sign of the scalar part $q_r$ executes the \textbf{exact opposite rotation} relative to the original orientation.
+
+\section*{Question 5: NED to Vehicle Frame Rotation}
+\question{An attacker modifies the GPS coordinates of a drone operating in a North-East-Down (NED) frame. The original position vector is $pv_1$. The attacker injects a rotation command to rotate the frame around the $j$-axis by an angle $\theta = 60^\circ$, creating a new vehicle frame. Formulate the resulting position vector $pv_2$ in terms of the original vector $pv_1$.}
+
+For a passive frame rotation (where the coordinate frame rotates but the physical vector remains static), the new coordinates $pv_2$ are obtained using the transpose of the active rotation matrix (the Direction Cosine Matrix):
+\begin{equation}
+pv_2 = R_y(60^\circ)^T pv_1 = \begin{bmatrix} \cos 60^\circ & 0 & -\sin 60^\circ \\ 0 & 1 & 0 \\ \sin 60^\circ & 0 & \cos 60^\circ \end{bmatrix} \begin{bmatrix} n \\ e \\ d \end{bmatrix}
+\end{equation}
+Substituting the values ($\cos 60^\circ = 0.5$, $\sin 60^\circ = \sqrt{3}/2$):
+\begin{equation}
+pv_2 = \begin{bmatrix} \frac{1}{2}n - \frac{\sqrt{3}}{2}d \\ e \\ \frac{\sqrt{3}}{2}n + \frac{1}{2}d \end{bmatrix}
+\end{equation}
+This formulation represents the coordinates of the location in the new vehicle frame.
+
+\section*{Question 6: 2D Complex Rotations}
+\question{A denial-of-service attack targets the flight control module by feeding it a sequence of rapid, contradictory rotations defined by complex numbers in a 2D plane. The initial vector $w$ is multiplied by $z_1 = e^{i\theta_1}$ and then immediately by $z_2 = e^{i\theta_2}$. Derive the final orientation of the vector and explain how the mathematical properties simplify the combined transformation.}
+
+Sequential rotations in the complex plane are multiplicative:
+\begin{equation}
+w_{final} = w \cdot e^{i\theta_1} \cdot e^{i\theta_2} = w \cdot e^{i(\theta_1 + \theta_2)}
+\end{equation}
+The mathematical property of exponents ($e^a e^b = e^{a+b}$) demonstrates that 2D rotations are additive and commutative, simplifying complex sequences of maneuvers into a single angular sum.
+
+\section*{Question 7: Body Angular Velocity from Malicious Yaw Rate}
+\question{An attacker subtly modifies the inertial rotational velocity vector $[\dot{\phi}, \dot{\theta}, \dot{\psi}]^T$ to slowly drift the drone off course. Given a constant malicious yaw rate injection $\dot{\psi}_{malicious}$ alongside zero roll and pitch rates, calculate the resulting body angular velocity vector $[p, q, r]^T$ using the kinematic Jacobian matrix.}
+
+The forward kinematic Jacobian $J$ maps Euler rates $[\dot{\phi}, \dot{\theta}, \dot{\psi}]^T$ to body angular velocities $[p, q, r]^T$:
+\begin{equation}
+\begin{bmatrix} p \\ q \\ r \end{bmatrix} = \begin{bmatrix} 1 & 0 & -\sin \theta \\ 0 & \cos \phi & \sin \phi \cos \theta \\ 0 & -\sin \phi & \cos \phi \cos \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix}
+\end{equation}
+Given $\dot{\psi} = \dot{\psi}_{malicious}$ and $\dot{\phi} = \dot{\theta} = 0$:
+\begin{itemize}
+    \item $p = -\dot{\psi}_{malicious} \sin \theta$
+    \item $q = \dot{\psi}_{malicious} \sin \phi \cos \theta$
+    \item $r = \dot{\psi}_{malicious} \cos \phi \cos \theta$
+\end{itemize}
+
+\section*{Question 8: Wind Spoofing Inner Product}
+\question{A spoofing attack provides a false 2D vector representation for wind direction $v = r \cos \theta \mathbf{i} + r \sin \theta \mathbf{j}$. The attacker maliciously increases the magnitude $r$ by a scaling factor of $k$. Calculate the new inner product of this vector with the unit vector $\mathbf{i}$, representing the perceived x-component.}
+
+The spoofed vector is $v = kr \cos \theta \mathbf{i} + kr \sin \theta \mathbf{j}$. Its inner product with unit vector $\mathbf{i}$:
+\begin{equation}
+\langle v, \mathbf{i} \rangle = (kr \cos \theta)(1) + (kr \sin \theta)(0) = kr \cos \theta
+\end{equation}
+
+\section*{Question 9: Negated Roll Gyro}
+\question{A cyber-physical attack tampers with the inertial sensor data, causing the roll gyro measurement $p$ to be replaced by its negative $-p$. Assuming the pitch rate $q$ and yaw rate $r$ are precisely zero, use the Inverse Jacobian matrix to determine the effect on the Euler roll rate $\dot{\phi}$.}
+
+With $p_{measure} = -p_{true}$ and $q=r=0$, we look at the first row of the inverse Jacobian mapping:
+\begin{equation}
+\dot{\phi} = 1 \cdot p_{measure} + (\sin \phi \tan \theta) \cdot 0 + (\cos \phi \tan \theta) \cdot 0 = -p_{true}
+\end{equation}
+The perceived physical roll rate is exactly negated, leading the control system to compensate in the wrong direction.
+
+\section*{Question 10: Opposite Quaternion Rotation}
+\question{A malicious payload seeks to silently corrupt a desired rotation applied to an ordinary 3-dimensional vector $p$. The normal operation utilizes conjugation $p' = qpq^{-1}$. The attacker alters the algorithm code to instead perform $p_{malicious} = q^{-1}pq$. Prove mathematically that this alteration executes the exact opposite rotation.}
+
+Standard rotation: $p' = qpq^{-1}$. Spoofed rotation: $p_{mal} = q^{-1}pq$.
+For a unit quaternion $q$ which represents a rotation by $\theta$, the inverse $q^{-1}$ (the conjugate $q^*$) represents the rotation by angle $-\theta$ around the same axis.
+Since $q^{-1}pq = (q^{-1})p(q^{-1})^{-1}$, the malicious operation executes the exact opposite rotation.
+
+\end{document}

@@ -1,0 +1,83 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/UnevenTerrain.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/Forest.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro.proto"
+
+WorldInfo {
+  basicTimeStep 16
+}
+Viewpoint {
+  orientation -0.5 0.5 0.7 1.2
+  position 15 15 20
+}
+TexturedBackground {
+  texture "noon_cloudy_countryside"
+}
+TexturedBackgroundLight {}
+UnevenTerrain {
+  size 60 60 4
+  flatCenter TRUE
+  appearance Grass {
+    type "mossy"
+  }
+}
+Forest {
+  type "pine tree"
+  density 0.005
+  shape [
+    -25 -25
+    25 -25
+    25 25
+    -25 25
+  ]
+}
+
+Mavic2Pro {
+  translation -5 0 0.5
+  name "mavic 1"
+  controller "swarm_controller"
+  bodySlot [
+    Emitter { channel 1 }
+    Receiver { channel 1 }
+  ]
+}
+
+Mavic2Pro {
+  translation 0 0 0.5
+  name "mavic 2"
+  controller "swarm_controller"
+  bodySlot [
+    Emitter { channel 1 }
+    Receiver { channel 1 }
+  ]
+}
+
+Mavic2Pro {
+  translation 5 0 0.5
+  name "mavic 3"
+  controller "swarm_controller"
+  bodySlot [
+    Emitter { channel 1 }
+    Receiver { channel 1 }
+  ]
+}
+
+Robot {
+  translation 18 -12 1.5
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 1
+      }
+      geometry Sphere {
+        radius 0.3
+      }
+    }
+  ]
+  name "hiker"
+}

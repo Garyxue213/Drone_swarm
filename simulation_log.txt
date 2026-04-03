@@ -1,0 +1,81 @@
+--- INITIATING SAR SWARM MISSION ---
+Area: 500m x 500m | Drones: 3 | Mode: Dynamic Sectoring
+
+T+0s:
+  Heartbeat: [1, 2, 3] active
+  D1: POS(0, 10) | BATT:99.9%
+  D2: POS(0, 10) | BATT:99.9%
+  D3: POS(0, 10) | BATT:99.9%
+
+T+1s:
+  Heartbeat: [1, 2, 3] active
+  D1: POS(0, 20) | BATT:99.8%
+  D2: POS(0, 20) | BATT:99.8%
+  D3: POS(0, 20) | BATT:99.8%
+
+T+2s:
+  Heartbeat: [1, 2, 3] active
+  D1: POS(0, 30) | BATT:99.7%
+  D2: POS(0, 30) | BATT:99.7%
+  D3: POS(0, 30) | BATT:99.7%
+
+T+3s:
+  Heartbeat: [1, 2, 3] active
+  D1: POS(0, 40) | BATT:99.6%
+  D2: POS(0, 40) | BATT:99.6%
+  D3: POS(0, 40) | BATT:99.6%
+
+T+4s:
+  Heartbeat: [1, 2, 3] active
+  D1: POS(0, 50) | BATT:99.5%
+  D2: POS(0, 50) | BATT:99.5%
+  D3: POS(0, 50) | BATT:99.5%
+
+T+5s:
+  Heartbeat: [1, 2, 3] active
+  [!] ALERT: Drone 3 Comm interference detected (JAMMING ATTACK)
+  D1: POS(0, 60) | BATT:99.4%
+  D2: POS(0, 60) | BATT:99.4%
+
+T+6s:
+  Heartbeat: [1, 2] active
+  [SYSTEM] Drone 3 lost. Re-allocating sector 334-500 to Drones 1 & 2...
+  D1: POS(0, 70) | BATT:99.3%
+  D2: POS(0, 70) | BATT:99.3%
+
+T+7s:
+  Heartbeat: [1, 2] active
+  D1: POS(0, 80) | BATT:99.2%
+  D2: POS(0, 80) | BATT:99.2%
+
+T+8s:
+  Heartbeat: [1, 2] active
+  D1: POS(0, 90) | BATT:99.1%
+  D2: POS(0, 90) | BATT:99.1%
+
+T+9s:
+  Heartbeat: [1, 2] active
+  D1: POS(0, 100) | BATT:99.0%
+  D2: POS(0, 100) | BATT:99.0%
+
+T+10s:
+  Heartbeat: [1, 2] active
+  D1: POS(0, 110) | BATT:98.9%
+  D2: POS(0, 110) | BATT:98.9%
+
+T+11s:
+  Heartbeat: [1, 2] active
+  D1: POS(0, 120) | BATT:98.8%
+  D2: POS(0, 120) | BATT:98.8%
+
+T+12s:
+  Heartbeat: [1, 2] active
+  D1: POS(0, 130) | BATT:98.7%
+  D2: POS(0, 130) | BATT:98.7%
+
+T+13s:
+  Heartbeat: [1, 2] active
+  [FOUND] Drone 1 spotted target at (0, 150)!
+
+--- MISSION SUCCESS ---
+Search concluded in 14 seconds.
