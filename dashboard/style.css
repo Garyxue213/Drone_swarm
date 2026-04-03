@@ -275,7 +275,9 @@ h3 {
 }
 
 .drone-marker.gps-anomaly {
-  transition: all 0.05s linear !important; /* Fast transitions for jitter */
+  transition: none !important; /* Zero transition for instant jitter visualization */
+  filter: drop-shadow(0 0 15px #ef4444) !important;
+  animation: none;
 }
 
 .drone-marker img {

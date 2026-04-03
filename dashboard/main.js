@@ -194,6 +194,7 @@ document.getElementById('btn-inject-spoof').addEventListener('click', () => {
   if (activeWs && activeWs.readyState === WebSocket.OPEN) {
     activeWs.send(JSON.stringify({ command: 'spoof' }));
     logEvent("PACKET INJECTION: GPS OFFSET OVERRIDE", true);
+    console.log("Hacker: Injecting Spoof Command...");
   }
 });
 

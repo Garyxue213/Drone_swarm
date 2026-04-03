@@ -48,6 +48,7 @@ async def simulation_loop(websocket):
                     fire_active = True
                 elif data.get("command") == "spoof":
                     gps_spoofed = True
+                    print("[BACKEND] External SPOOFING Attack Active on Drone 2!")
             except (asyncio.TimeoutError, json.JSONDecodeError):
                 pass
 
@@ -100,9 +101,9 @@ async def simulation_loop(websocket):
                 display_y = drone_pos[i][1]
                 
                 if gps_spoofed and i == 1:
-                    # The "Spoof" jitter (Increased intensity for visibility)
-                    display_x += random.uniform(-25.0, 25.0)
-                    display_y += random.uniform(-25.0, 25.0)
+                    # The "Spoof" jitter (Extremely high intensity for guaranteed visibility)
+                    display_x += random.uniform(-35.0, 35.0)
+                    display_y += random.uniform(-35.0, 35.0)
                     status_str = "GPS ANOMALY"
                     sector_str = "STATION KEEPING"
                 
