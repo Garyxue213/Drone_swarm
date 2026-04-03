@@ -3,6 +3,7 @@ import websockets
 import json
 import math
 import time
+import random
 
 GRID_SIZE = 100
 FAILURE_TIME = 15
@@ -40,6 +41,7 @@ async def simulation_loop(websocket):
                     target_widths = [GRID_SIZE/3] * 3
                     fire_active = False
                     gps_spoofed = False
+                    print("[BACKEND] Mission Restarted.")
                 elif data.get("command") == "rtl":
                     batteries = [14.0, 14.0, 14.0]
                 elif data.get("command") == "fire":
@@ -98,7 +100,6 @@ async def simulation_loop(websocket):
                 display_y = drone_pos[i][1]
                 
                 if gps_spoofed and i == 1:
-                    import random
                     # The "Spoof" jitter (Increased intensity for visibility)
                     display_x += random.uniform(-25.0, 25.0)
                     display_y += random.uniform(-25.0, 25.0)

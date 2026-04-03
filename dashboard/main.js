@@ -186,14 +186,14 @@ function connectWebSocket() {
 document.getElementById('btn-inject-fire').addEventListener('click', () => {
   if (activeWs && activeWs.readyState === WebSocket.OPEN) {
     activeWs.send(JSON.stringify({ command: 'fire' }));
-    logEvent("💀 PACKET INJECTION: FORCED FIRE ALERT", true);
+    logEvent("PACKET INJECTION: FORCED FIRE ALERT", true);
   }
 });
 
 document.getElementById('btn-inject-spoof').addEventListener('click', () => {
   if (activeWs && activeWs.readyState === WebSocket.OPEN) {
     activeWs.send(JSON.stringify({ command: 'spoof' }));
-    logEvent("💀 PACKET INJECTION: GPS OFFSET OVERRIDE", true);
+    logEvent("PACKET INJECTION: GPS OFFSET OVERRIDE", true);
   }
 });
 
