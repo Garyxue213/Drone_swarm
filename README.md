@@ -5,8 +5,18 @@ Welcome to the **Drone Swarm Construction Mapping** visualizer. This repository 
 ## Project Scope
 This project pivots away from basic search and rescue to address modern industrial capabilities: **Digital Twins** and **Site Safety**. The drone swarm dynamically tracks topographical elevations (Z-Axis), executes Orthomosaic patterns, and features a self-healing algorithm where surviving drones will expand their search footprint if a teammate suffers hardware malfunction or battery depletion.
 
-## How to Run the Logic Visualizer
-The AI logic and simulation is visualized entirely through a Python 3D Topographical Map.
+## How to Run the Visualizers
+We offer two distinct ways to run the algorithm:
+
+### 1. Google Earth KML Export 🌍 (High Realism)
+To view the simulation mapped directly over real-world satellite imagery and 3D terrain:
+1. Run `pip install simplekml`
+2. Run `python3 webots_swarm/generate_kml.py`
+3. A `drone_survey.kml` file will be generated in your root directory.
+4. Drag and drop this `.kml` file into [Google Earth Web](https://earth.google.com/) or double-click to open in Google Earth Pro. You will see the entire flight survey!
+
+### 2. Python 3D Logic Visualizer (UI)
+The AI logic is also visualized through an interactive Python 3D simulation featuring live POV target cameras.
 
 **Requirements**: You must have `matplotlib` and `numpy` installed.
 ```bash
@@ -17,7 +27,6 @@ pip install matplotlib numpy
 ```bash
 python3 webots_swarm/swarm_3d_sim.py
 ```
-*(Or simply run the included `Launch_3D_Logic_Viz.command` file on Mac/Linux).*
 
 ## Interactive Testing Controls (Keyboard HUD)
 While the simulation runs, you can trigger events to test the swarm's real-time dynamic pathing:

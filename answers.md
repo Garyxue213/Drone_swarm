@@ -20,4 +20,4 @@ The swarm is designed around robust **IoT failover logic** to maintain 100% surv
 ## Industry Safety Alignment
 Based on research from the *American Institute of Constructors* and *Work Zone Safety*:
 *   **Aerial Hazard Identification**: Drones can inspect high-voltage lines or unstable towers, removing the need for manual suspension harnesses.
-*   **Digital Twins**: The grid coordinate math collected by these drones is traditionally exported to a `.kml` file and fed into photogrammetry contexts to generate state-of-the-art interactive 3D models for stakeholder review based on the visual tracking logic proven in our simulation.
+*   **Google Earth Integration (Realism)**: Using `simplekml`, our mathematical drone paths and site topology are dynamically converted from a simulated grid into exact GPS coordinates (mapped over Hudson Yards, NYC). This exports a `drone_survey.kml` architecture file, allowing users to drag-and-drop the entire swarm flight survey directly into Google Earth for ultra-realistic structural inspection and Digital Twin mapping.
