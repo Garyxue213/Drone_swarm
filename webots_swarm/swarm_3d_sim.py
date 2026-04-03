@@ -353,7 +353,7 @@ class SwarmSim3D:
 
         # Camera Pan
         if self.view_mode == 0:
-            self.ax.view_init(elev=85, azim=-90) # Straight down on the site
+            self.ax.view_init(elev=55, azim=-45) # Static Isometric View (Shows depth, no spinning)
         else:
             self.ax.view_init(elev=35, azim=-60 + (self.time * 0.8)) # Dramatic panning
         
