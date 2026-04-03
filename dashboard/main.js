@@ -171,6 +171,9 @@ function connectWebSocket() {
       // Update Hacker Terminal (Bonus: Eavesdropping Case)
       const hackerTerm = document.getElementById('hacker-terminal');
       if (hackerTerm) {
+        if (d.status === "GPS ANOMALY") {
+          console.log("[HACKER] Intercepted Spoofed Packet for D2:", d.x.toFixed(2), d.y.toFixed(2));
+        }
         const p = document.createElement('div');
         p.className = 'packet-intercept';
         p.innerText = `[RECV] ${JSON.stringify(dronesData).substring(0, 80)}...`;
@@ -215,14 +218,14 @@ document.getElementById('btn-rtl').addEventListener('click', () => {
 document.getElementById('btn-fire').addEventListener('click', () => {
   if (activeWs && activeWs.readyState === WebSocket.OPEN) {
     activeWs.send(JSON.stringify({ command: 'fire' }));
-    logEvent("🔥 Fire Alert injected!", true);
+    logEvent("Fire Alert injected!", true);
   }
 });
 
 document.getElementById('btn-spoof').addEventListener('click', () => {
   if (activeWs && activeWs.readyState === WebSocket.OPEN) {
     activeWs.send(JSON.stringify({ command: 'spoof' }));
-    logEvent("🛰️ GPS Spoofing Attack Injected!", true);
+    logEvent("GPS Spoofing Attack Injected!", true);
   }
 });
 
