@@ -22,6 +22,7 @@ async def simulation_loop(websocket):
     sectors = ["Sector A", "Sector B", "Sector C"]
     
     fire_active = False
+    gps_spoofed = False
     fire_pos = [65.0, 65.0]
 
     while True:
@@ -38,6 +39,7 @@ async def simulation_loop(websocket):
                     curr_widths = [GRID_SIZE/3] * 3
                     target_widths = [GRID_SIZE/3] * 3
                     fire_active = False
+                    gps_spoofed = False
                 elif data.get("command") == "rtl":
                     batteries = [14.0, 14.0, 14.0]
                 elif data.get("command") == "fire":
